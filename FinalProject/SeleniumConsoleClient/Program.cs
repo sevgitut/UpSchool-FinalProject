@@ -8,6 +8,7 @@ using static System.Net.Mime.MediaTypeNames;
 using Application.Common.Models.Log;
 using Domain.Enums;
 using Domain.Filters;
+using Domain.Dtos;
 
 class Program
 {
@@ -18,14 +19,28 @@ class Program
 
         IWebDriver driver = new ChromeDriver();
 
-        //hubConnection = new HubConnectionBuilder()
-        //    .WithUrl("http://localhost:7269/Hubs/SeleniumLogHub")
-        //    .WithAutomaticReconnect()
-        //    .Build();
+        var orderHubConnection = new HubConnectionBuilder()
+                .WithUrl("http://localhost:5210/Hubs/OrderHub")
+                .WithAutomaticReconnect()
+                .Build();
 
-        //await hubConnection.StartAsync();
+        await orderHubConnection.StartAsync();
 
-        //await hubConnection.InvokeAsync("SendLogNotificationAsync", CreateLog("Bot started.", OrderStatus.BotStarted));
+        var productHubConnection = new HubConnectionBuilder()
+            .WithUrl("http://localhost:5210/Hubs/ProductHub")
+            .WithAutomaticReconnect()
+            .Build();
+
+        await productHubConnection.StartAsync();
+
+        var hubConnection = new HubConnectionBuilder()
+            .WithUrl("http://localhost:5210/Hubs/SeleniumLogHub")
+            .WithAutomaticReconnect()
+            .Build();
+
+        await hubConnection.StartAsync();
+
+        await hubConnection.InvokeAsync("SendLogNotificationAsync", CreateLog("Bot started.", OrderStatus.BotStarted));
 
 
         List<Product> productList = new List<Product>();
@@ -48,7 +63,7 @@ class Program
 
         //await hubConnection.InvokeAsync("SendLogNotificationAsync", CreateLog("Crawling started", OrderStatus.CrawlingStarted));
 
-        string url = "https://finalproject.dotnet.gg/?currentPage=";
+        string url = "https://4teker.net/?currentPage=";
         int itemsFetched = 0;
         int pageIndex = 1;
 
@@ -148,7 +163,13 @@ class Program
         }
     }
 
-    static SeleniumLogDto CreateLog(string message) => new SeleniumLogDto(message);
+    static SeleniumLogDto CreateLog(string message, OrderStatus status) => new SeleniumLogDto(message, status);
+
+    static ProductDto ProductAdd(Guid id, Guid orderId, string name, string pictureUrl, decimal salePrice, decimal price, bool IsOnSale) =>
+        new ProductDto(id, orderId, name, pictureUrl, salePrice, price, IsOnSale);
+
+    static OrderDto OrderAdd(Guid id, int requestedAmount, int totalAmount, ProductCrawlType productCrawlType) =>
+        new OrderDto(id, requestedAmount, totalAmount, productCrawlType);
 }
 
 

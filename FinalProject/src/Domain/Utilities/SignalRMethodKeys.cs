@@ -2,6 +2,11 @@
 {
     public static class SignalRMethodKeys
     {
+        public static class Order
+        {
+            public static string Added => nameof(Added);
+           
+        }
         public static class Accounts
         {
             public static string Added => nameof(Added);

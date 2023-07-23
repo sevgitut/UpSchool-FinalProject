@@ -26,7 +26,7 @@
     protected override async Task OnInitializedAsync()
     {
         hubConnection = new HubConnectionBuilder()
-            .WithUrl("http://localhost:7269/Hubs/SeleniumLogHub")
+            .WithUrl("http://localhost:5120/Hubs/SeleniumLogHub")
             .WithAutomaticReconnect()
             .Build();
 
